@@ -1,9 +1,9 @@
-name: Build on Push
+name: Build & Security Check
 
 on:
   push:
     branches:
-      - main   # 👈 change this if you use a different branch (e.g. "master" or "dev")
+      - main
 
 jobs:
   build:
@@ -16,12 +16,21 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18   # 👈 use your Node.js version
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
+      - name: Audit dependencies (fail on high/critical)
+        run: npm audit --audit-level=high
+
       - name: Build project
         run: npm run build
 
-      
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifact
+          path: |
+            dist
+            build
